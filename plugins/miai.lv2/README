@@ -1,0 +1,7 @@
+Miai
+====
+
+Miai (Musical Instrument Anachronistic Interface) is a set of LV2 plugins for
+transforming MIDI messages.
+
+ -- David Robillard <d@drobilla.net>

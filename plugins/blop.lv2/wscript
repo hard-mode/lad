@@ -1,0 +1,166 @@
+#!/usr/bin/env python
+import os
+import shutil
+import subprocess
+import waflib.Options as Options
+import waflib.extras.autowaf as autowaf
+
+BLOP_VERSION = '1.0.0'
+
+# Mandatory waf variables
+APPNAME = 'blop-lv2'    # Package name for waf dist
+VERSION = BLOP_VERSION  # Package version for waf dist
+top     = '.'           # Source directory
+out     = 'build'       # Build directory
+
+def options(opt):
+    opt.load('compiler_c')
+    autowaf.set_options(opt)
+    opt.add_option('--rate', type='int', default=48000,
+                   dest='rate',
+                   help='Ideal sample rate for oscillator wave tables [Default: 48000]')
+
+def configure(conf):
+    conf.load('compiler_c')
+    autowaf.configure(conf)
+    autowaf.set_c99_mode(conf)
+    autowaf.display_header('Blop.LV2 Configuration')
+
+    autowaf.check_pkg(conf, 'lv2', atleast_version='1.2.0', uselib_store='LV2')
+
+    conf.check(function_name = 'sinf',
+               header_name   = 'math.h',
+               lib           = 'm',
+               define_name   = 'HAVE_SINF',
+               mandatory     = False)
+
+    conf.write_config_header('blop_config.h', remove=False)
+
+    # Set env.pluginlib_PATTERN
+    pat = conf.env.cshlib_PATTERN
+    if pat[0:3] == 'lib':
+        pat = pat[3:]
+    conf.env.pluginlib_PATTERN = pat
+    conf.env.pluginlib_EXT = pat[pat.rfind('.'):]
+
+    conf.define('BLOP_SHLIB_EXT', conf.env.pluginlib_EXT)
+
+    autowaf.display_msg(conf, 'LV2 bundle directory',
+                        conf.env.LV2DIR)
+    autowaf.display_msg(conf, 'Ideal oscillator sampling rate',
+                        Options.options.rate)
+    print('')
+
+def build_plugin(bld, lang, bundle, name, source, defines=None):
+    # Build plugin library
+    penv = bld.env.derive()
+    penv.cshlib_PATTERN = bld.env.pluginlib_PATTERN
+    obj = bld(features     = '%s %sshlib' % (lang,lang),
+              env          = penv,
+              source       = source,
+              includes     = ['.', 'src/include'],
+              name         = name,
+              target       = os.path.join(bundle, name),
+              uselib       = ['LV2'],
+              install_path = '${LV2DIR}/' + bundle)
+    if defines != None:
+        obj.defines = defines
+
+    # Install data file
+    data_file = '%s.ttl' % name
+    bld.install_files('${LV2DIR}/' + bundle, os.path.join(bundle, data_file))
+
+def build(bld):
+    for i in bld.path.ant_glob('blop.lv2/*.ttl'):
+        bld(features     = 'subst',
+            is_copy      = True,
+            source       = i,
+            target       = bld.path.get_bld().make_node('blop.lv2/%s' % i),
+            install_path = '${LV2DIR}/blop.lv2')
+
+    bld(features     = 'subst',
+        source       = 'blop.lv2/manifest.ttl.in',
+        target       = bld.path.get_bld().make_node('blop.lv2/manifest.ttl'),
+        LIB_EXT      = bld.env.pluginlib_EXT,
+        install_path = '${LV2DIR}/blop.lv2')
+
+    plugins = '''
+		adsr
+		adsr_gt
+		amp
+		branch
+		dahdsr
+		difference
+		fmod
+		interpolator
+		product
+		random
+		ratio
+		sum
+		sync_pulse
+		sync_square
+		tracker
+	'''.split()
+
+    # Simple (single source file) plugins
+    for i in plugins:
+        build_plugin(bld, 'c', 'blop.lv2', i,
+                     ['src/%s.c' % i])
+
+    # Low pass filter
+    build_plugin(bld, 'c', 'blop.lv2', 'lp4pole',
+                 ['src/lp4pole.c', 'src/lp4pole_filter.c'])
+
+    # Oscillators
+    for i in ['pulse', 'sawtooth', 'square', 'triangle']:
+        build_plugin(bld, 'c', 'blop.lv2', i,
+                     ['src/%s.c' % i, 'src/wavedata.c'])
+
+    # Sequencers
+    for i in [16, 32, 64]:
+        uri = 'http://drobilla.net/plugins/blop/sequencer_%d' % i
+        build_plugin(bld, 'c', 'blop.lv2', 'sequencer_%d' % i,
+                     ['src/sequencer.c'],
+                     defines=['SEQUENCER_MAX_INPUTS=%d' % i,
+                              'SEQUENCER_URI="%s"' % uri])
+
+    # Quantisers
+    for i in [20, 50, 100]:
+        uri = 'http://drobilla.net/plugins/blop/quantiser_%d' % i
+        build_plugin(bld, 'c', 'blop.lv2', 'quantiser_%d' % i,
+                     ['src/quantiser.c'],
+                     defines=['QUANTISER_MAX_INPUTS=%d' % i,
+                              'QUANTISER_URI="%s"' % uri])
+
+    # Wavegen
+    wavegen = bld(features     = 'c cprogram',
+                  source       = ['src/wavegen.c', 'src/wdatutil.c'],
+                  target       = 'src/wavegen',
+                  name         = 'wavegen',
+                  includes     = ['.', 'src/include'],
+                  lib          = ['m'],
+                  install_path = None)
+
+    wavegen.post()
+
+    # Waveform data source
+    for i in ['parabola', 'sawtooth', 'square']:
+        bld(rule = '${SRC} -r %d -f 12 -s 1 -m 128 -g 1.0 -w %s -p %s -o ${TGT}' % (
+            Options.options.rate, i, i),
+            source = wavegen.link_task.outputs[0],
+            target = 'src/%s_data.c' % i,
+            name = i)
+
+        penv = bld.env.derive()
+        penv.cshlib_PATTERN = bld.env.pluginlib_PATTERN
+
+        bld(features     = 'c cshlib',
+            source       = bld.path.get_bld().make_node('src/%s_data.c' % i),
+            target       = 'blop.lv2/%s_data' % i,
+            includes     = ['.', 'src/include'],
+            env          = penv,
+            install_path = '${LV2DIR}/blop.lv2',
+            uselib       = ['LV2'])
+              
+def lint(ctx):
+    subprocess.call('cpplint.py --filter=+whitespace/comments,-whitespace/tab,-whitespace/braces,-whitespace/labels,-build/header_guard,-readability/casting,-readability/todo,-build/include src/* serd/*', shell=True)

@@ -1,0 +1,26 @@
+ganv (1.4.0) stable;
+
+  * Begin using library and pkg-config names suitable for parallel
+    installation.  This version of flowcanvas is flowcanvas-1 and is
+    NOT compatible with previous versions
+  * Clean up API and improve documentation.
+  * Add font size API
+  * Use system theme font size by default
+  * Size empty ports in font based units so they look right when zoomed
+  * Adjust padding and placement to precisely fit text
+  * Add ability to select connections directly
+  * Add Connection::set_curved()
+  * Fix lingering handle when deleting connections
+  * Dramatically increase performance by rendering text manually
+    rather than using the truly awful Gnome::Canvas::Text.
+  * Remove use of boost smart pointers.  Adding and removing from containers
+    (e.g. Canvas, Module) is now done automatically.
+  * Clean up API/ABI by hiding private implementations.
+  * Add ability to select connections by their handles, either individually
+    or in groups with rect select.
+  * Further slight improvements in memory consumption and alignment.
+  * Improve scalability to graphs with many connections (eliminate linear
+    connection searches and redundant connection collections).
+  * Switch to GPLv3+
+
+ -- David Robillard <d@drobilla.net>  Sun, 27 Apr 2014 23:44:29 -0400

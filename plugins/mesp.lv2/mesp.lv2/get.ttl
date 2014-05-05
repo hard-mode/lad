@@ -1,0 +1,46 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix mesp: <http://drobilla.net/plugins/mesp/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
+
+<http://drobilla.net/plugins/mesp/get#property>
+	a rdf:Property ;
+	rdfs:range rdf:Property .
+
+mesp:get
+	a lv2:Plugin ;
+	lv2:project mesp: ;
+	lv2:microVersion 0 ;
+	lv2:minorVersion 0 ;
+	lv2:optionalFeature lv2:hardRTCapable ;
+	lv2:requiredFeature urid:map ;
+	lv2:port [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports atom:Object ;
+		lv2:index 0 ;
+		lv2:symbol "in" ;
+		lv2:name "Input"
+	] , [
+		a lv2:OutputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports atom:Atom ;
+		lv2:index 1 ;
+		lv2:symbol "values" ;
+		lv2:name "Values"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:URID ;
+		lv2:designation <http://drobilla.net/plugins/mesp/get#property> ;
+		lv2:index 2 ;
+		lv2:symbol "prop" ;
+		lv2:name "Property"
+	] ;
+	doap:name "Get" ;
+	rdfs:comment "Get the value of a particular property for every input." .

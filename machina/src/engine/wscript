@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+
+def build(bld):
+    core_source = '''
+            ActionFactory.cpp
+            Controller.cpp
+            Edge.cpp
+            Engine.cpp
+            JackDriver.cpp
+            LearnRequest.cpp
+            Loader.cpp
+            Machine.cpp
+            MachineBuilder.cpp
+            MidiAction.cpp
+            Mutation.cpp
+            Node.cpp
+            Recorder.cpp
+            SMFDriver.cpp
+            SMFReader.cpp
+            SMFWriter.cpp
+            Stateful.cpp
+            Updates.cpp
+            URIs.cpp
+    '''
+    if bld.is_defined('HAVE_EUGENE'):
+        core_source += '''
+                Evolver.cpp
+                Problem.cpp
+        '''
+    obj = bld(features = 'cxx cxxshlib')
+    obj.source = core_source
+    obj.export_includes = ['.']
+    obj.includes = ['.', '..', '../..']
+    obj.name     = 'libmachina_engine'
+    obj.target   = 'machina_engine'
+    core_libs = 'RAUL GLIBMM GTHREAD RAUL SERD SORD JACK LV2'
+    if bld.is_defined('HAVE_EUGENE'):
+        core_libs += ' EUGENE '
+    autowaf.use_lib(bld, obj, core_libs)
+
+    bld.add_post_fun(autowaf.run_ldconfig)

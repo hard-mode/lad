@@ -1,0 +1,106 @@
+/*
+  This file is part of Ingen.
+  Copyright 2007-2012 David Robillard <http://drobilla.net/>
+
+  Ingen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU Affero General Public License as published by the Free
+  Software Foundation, either version 3 of the License, or any later version.
+
+  Ingen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  A PARTICULAR PURPOSE.  See the GNU Affero General Public License for details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with Ingen.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "ingen/URIs.hpp"
+#include "lv2/lv2plug.in/ns/ext/atom/util.h"
+
+#include "ArcImpl.hpp"
+#include "BlockImpl.hpp"
+#include "Buffer.hpp"
+#include "BufferFactory.hpp"
+#include "Engine.hpp"
+#include "InputPort.hpp"
+#include "OutputPort.hpp"
+#include "PortImpl.hpp"
+
+namespace Ingen {
+namespace Server {
+
+/** Constructor for an arc from a block's output port.
+ *
+ * This handles both polyphonic and monophonic blocks, transparently to the
+ * user (InputPort).
+ */
+ArcImpl::ArcImpl(PortImpl* tail, PortImpl* head)
+	: _tail(tail)
+	, _head(head)
+{
+	assert(tail != head);
+	assert(tail->path() != head->path());
+}
+
+const Raul::Path&
+ArcImpl::tail_path() const
+{
+	return _tail->path();
+}
+
+const Raul::Path&
+ArcImpl::head_path() const
+{
+	return _head->path();
+}
+
+BufferRef
+ArcImpl::buffer(uint32_t voice) const
+{
+	assert(!must_mix());
+	assert(_tail->poly() == 1 || _tail->poly() > voice);
+	if (_tail->poly() == 1) {
+		return _tail->buffer(0);
+	} else {
+		return _tail->buffer(voice);
+	}
+}
+
+bool
+ArcImpl::must_mix() const
+{
+	return _tail->poly() > _head->poly();
+}
+
+bool
+ArcImpl::can_connect(const OutputPort* src, const InputPort* dst)
+{
+	const Ingen::URIs& uris = src->bufs().uris();
+	return (
+		// (Audio | Control | CV) => (Audio | Control | CV)
+		(   (src->is_a(PortType::ID::CONTROL) ||
+		     src->is_a(PortType::ID::AUDIO) ||
+		     src->is_a(PortType::ID::CV))
+		    && (dst->is_a(PortType::ID::CONTROL)
+		        || dst->is_a(PortType::ID::AUDIO)
+		        || dst->is_a(PortType::ID::CV)))
+
+		// Equal types
+		|| (src->type() == dst->type() &&
+		    src->buffer_type() == dst->buffer_type())
+
+		// Control => atom:Float Value
+		|| (src->is_a(PortType::ID::CONTROL) && dst->supports(uris.atom_Float))
+
+		// Audio => atom:Sound Value
+		|| (src->is_a(PortType::ID::AUDIO) && dst->supports(uris.atom_Sound))
+
+		// atom:Float Value => Control
+		|| (src->supports(uris.atom_Float) && dst->is_a(PortType::ID::CONTROL))
+
+		// atom:Sound Value => Audio
+		|| (src->supports(uris.atom_Sound) && dst->is_a(PortType::ID::AUDIO)));
+}
+
+} // namespace Server
+} // namespace Ingen

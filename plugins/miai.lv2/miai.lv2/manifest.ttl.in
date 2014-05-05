@@ -1,0 +1,30 @@
+@prefix miai: <http://drobilla.net/plugins/miai/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://drobilla.net/drobilla#me>
+	a foaf:Person ;
+	foaf:name "David Robillard" ;
+	foaf:mbox <mailto:d@drobilla.net> ;
+	rdfs:seeAlso <http://drobilla.net/drobilla> .
+
+miai:
+	a doap:Project ;
+	lv2:symbol "miai" ;
+	doap:name "Miai LV2" ;
+	doap:shortdesc "A set of MIDI message transorming plugins." ;
+	doap:homepage <http://drobilla.net/software/miai> ;
+	doap:license <http://opensource.org/licenses/gpl-3.0> ;
+	doap:maintainer <http://drobilla.net/drobilla#me> .
+
+miai:chan_demux
+	a lv2:Plugin ;
+	rdfs:seeAlso <chan_demux.ttl> ;
+	lv2:binary <chan_demux@LIB_EXT@> .
+
+miai:chan_mux
+	a lv2:Plugin ;
+	rdfs:seeAlso <chan_mux.ttl> ;
+	lv2:binary <chan_mux@LIB_EXT@> .

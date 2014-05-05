@@ -1,0 +1,23 @@
+This repository contains several projects.  Most are related, and many have
+direct dependencies.  They all share a unified build system (based on waf)
+that can be used to build the entire repository at once, or each project
+separately.  The /common directory must be checked out to build any
+component, e.g. to build raul you need both /common and /raul checked
+out into the same directory.  See INSTALL file for details.
+
+Information on the web about this software lives at <http://drobilla.net/>
+
+*** IMPORTANT ***
+
+You MUST clean your build if you want to switch between building the whole
+repository and configuring each project separately.  If you mix the two
+processes without cleaning BAD THINGS WILL HAPPEN.
+
+*** RUNNING FROM SOURCE DIRECTORY ***
+
+The top-level waf script provides a 'run' command to run programs from the
+build directory without requiring installation.  The run command requires
+a --cmd argument, and will set the necessary environment
+(e.g. LD_LIBRARY_PATH) for running programs from the build directory, e.g.:
+
+./waf run --cmd="build/patchage/patchage"

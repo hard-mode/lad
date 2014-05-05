@@ -1,0 +1,60 @@
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://drobilla.net/plugins/omins/comparison>
+	lv2:binary <file:///usr/local/lib/lv2/naspro-ladspa.lv2/ladspa.so> ;
+	lv2:microVersion 0 ;
+	lv2:minorVersion 0 ;
+	lv2:optionalFeature lv2:hardRTCapable ;
+	lv2:port [
+		lv2:index 0 ;
+		lv2:name "A" ;
+		lv2:symbol "port0" ;
+		a lv2:CVPort ,
+			lv2:InputPort ,
+			lv2:Port
+	] , [
+		lv2:index 1 ;
+		lv2:name "B" ;
+		lv2:symbol "port1" ;
+		a lv2:ControlPort ,
+			lv2:InputPort ,
+			lv2:Port
+	] , [
+		lv2:index 2 ;
+		lv2:name "Larger" ;
+		lv2:symbol "port2" ;
+		a lv2:CVPort ,
+			lv2:OutputPort ,
+			lv2:Port
+	] , [
+		lv2:index 3 ;
+		lv2:name "Smaller" ;
+		lv2:symbol "port3" ;
+		a lv2:CVPort ,
+			lv2:OutputPort ,
+			lv2:Port
+	] , [
+		lv2:index 4 ;
+		lv2:name "A > B" ;
+		lv2:symbol "port4" ;
+		a lv2:CVPort ,
+			lv2:OutputPort ,
+			lv2:Port
+	] , [
+		lv2:index 5 ;
+		lv2:name "A = B" ;
+		lv2:symbol "port5" ;
+		a lv2:CVPort ,
+			lv2:OutputPort ,
+			lv2:Port
+	] ;
+	<http://purl.org/dc/elements/1.1/creator> "Thorsten Wilms" ;
+	<http://purl.org/dc/elements/1.1/rights> "GPL" ;
+	doap:name "Comparison" ;
+	a lv2:Plugin .

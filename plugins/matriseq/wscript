@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+import waflib.extras.autowaf as autowaf
+
+MATRISEQ_VERSION = '1.0.0'
+
+# Mandatory waf variables
+APPNAME = 'matriseq'        # Package name for waf dist
+VERSION = MATRISEQ_VERSION  # Package version for waf dist
+top     = '.'               # Source directory
+out     = 'build'           # Build directory
+
+def options(opt):
+    opt.load('compiler_c')
+    autowaf.set_options(opt)
+
+def configure(conf):
+    conf.load('compiler_c')
+    autowaf.configure(conf)
+    autowaf.set_c99_mode(conf)
+    autowaf.display_header('Matriseq Configuration')
+
+    autowaf.check_pkg(conf, 'lv2', atleast_version='1.0.0', uselib_store='LV2')
+    autowaf.check_pkg(conf, 'naub-0', atleast_version='0.0.0', uselib_store='NAUB')
+
+    # Check for mlock
+    conf.check(function_name='mlock',
+               header_name='sys/mman.h',
+               define_name='HAVE_MLOCK',
+               mandatory=False)
+
+    # Set env.pluginlib_PATTERN
+    pat = conf.env.cshlib_PATTERN
+    if pat.startswith('lib'):
+        pat = pat[3:]
+    conf.env.pluginlib_PATTERN = pat
+    conf.env.pluginlib_EXT = pat[pat.rfind('.'):]
+
+    autowaf.display_msg(conf, "LV2 bundle directory", conf.env.LV2DIR)
+    print('')
+
+def build(bld):
+    bundle = 'matriseq.lv2'
+
+    # Build manifest.ttl by substitution (for portable lib extension)
+    bld(features     = 'subst',
+        source       = 'manifest.ttl.in',
+        target       = '%s/%s' % (bundle, 'manifest.ttl'),
+        install_path = '${LV2DIR}/%s' % bundle,
+        LIB_EXT      = bld.env.pluginlib_EXT)
+
+    # Copy other data files to build bundle (build/matriseq.lv2)
+    for i in ['matriseq.ttl']:
+        bld(features     = 'subst',
+            source       = i,
+            target       = '%s/%s' % (bundle, i),
+            install_path = '${LV2DIR}/%s' % bundle,
+            LIB_EXT      = bld.env.pluginlib_EXT)
+
+    # Create a build environment that builds module-style library names
+    # e.g. matriseq.so instead of libmatriseq.so
+    # Note for C++ you must set cxxshlib_PATTERN instead
+    penv                = bld.env.derive()
+    penv.cshlib_PATTERN = bld.env.pluginlib_PATTERN
+
+    # Build plugin library
+    obj = bld(features     = 'c cshlib',
+              env          = penv,
+              source       = ['matriseq.c', 'zix/ring.c'],
+              name         = 'matriseq',
+              target       = '%s/matriseq' % bundle,
+              install_path = '${LV2DIR}/%s' % bundle,
+              includes     = ['.'])
+    autowaf.use_lib(bld, obj, 'LV2 NAUB')
+

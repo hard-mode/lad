@@ -1,0 +1,87 @@
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://drobilla.net/plugins/omins/adenv_lvl>
+	a lv2:Plugin ;
+	rdfs:seeAlso <adenv_lvl.ttl> ;
+	lv2:binary <adenv_lvl@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/adenv>
+	a lv2:Plugin ;
+	rdfs:seeAlso <adenv.ttl> ;
+	lv2:binary <adenv@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/comparison>
+	a lv2:Plugin ;
+	rdfs:seeAlso <comparison.ttl> ;
+	lv2:binary <comparison@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/dahdsr_fexp>
+	a lv2:Plugin ;
+	rdfs:seeAlso <dahdsr_fexp.ttl> ;
+	lv2:binary <dahdsr_fexp@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/dahdsr_hexp>
+	a lv2:Plugin ;
+	rdfs:seeAlso <dahdsr_hexp.ttl> ;
+	lv2:binary <dahdsr_hexp@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/fast_crossfade>
+	a lv2:Plugin ;
+	rdfs:seeAlso <fast_crossfade.ttl> ;
+	lv2:binary <fast_crossfade@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/formant_filter>
+	a lv2:Plugin ;
+	rdfs:seeAlso <formant_filter.ttl> ;
+	lv2:binary <formant_filter@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/hz_voct>
+	a lv2:Plugin ;
+	rdfs:seeAlso <hz_voct.ttl> ;
+	lv2:binary <hz_voct@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/masher>
+	a lv2:Plugin ;
+	rdfs:seeAlso <masher.ttl> ;
+	lv2:binary <masher@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/multiplexer>
+	a lv2:Plugin ;
+	rdfs:seeAlso <multiplexer.ttl> ;
+	lv2:binary <multiplexer@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/prob_switch>
+	a lv2:Plugin ;
+	rdfs:seeAlso <prob_switch.ttl> ;
+	lv2:binary <prob_switch@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/range_trans>
+	a lv2:Plugin ;
+	rdfs:seeAlso <range_trans.ttl> ;
+	lv2:binary <range_trans@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/sample_and_hold>
+	a lv2:Plugin ;
+	rdfs:seeAlso <sample_and_hold.ttl> ;
+	lv2:binary <sample_and_hold@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/signal_abs>
+	a lv2:Plugin ;
+	rdfs:seeAlso <signal_abs.ttl> ;
+	lv2:binary <signal_abs@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/slew_limiter>
+	a lv2:Plugin ;
+	rdfs:seeAlso <slew_limiter.ttl> ;
+	lv2:binary <slew_limiter@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/slide>
+	a lv2:Plugin ;
+	rdfs:seeAlso <slide.ttl> ;
+	lv2:binary <slide@LIB_EXT@> .
+
+<http://drobilla.net/plugins/omins/waveguide_mesh>
+	a lv2:Plugin ;
+	rdfs:seeAlso <waveguide_mesh.ttl> ;
+	lv2:binary <waveguide_mesh@LIB_EXT@> .

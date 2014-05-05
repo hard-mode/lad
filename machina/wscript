@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+import os
+import subprocess
+
+from waflib.extras import autowaf as autowaf
+
+# Version of this package (even if built as a child)
+MACHINA_VERSION = '0.5.0'
+
+# Variables for 'waf dist'
+APPNAME = 'machina'
+VERSION = MACHINA_VERSION
+
+# Mandatory variables
+top = '.'
+out = 'build'
+
+def options(opt):
+    opt.load('compiler_cxx')
+    autowaf.set_options(opt)
+
+def configure(conf):
+    conf.line_just = 37
+    conf.load('compiler_cxx')
+    autowaf.configure(conf)
+    autowaf.display_header('Machina Configuration')
+
+    conf.check_cxx(cxxflags=["-std=c++0x"])
+    conf.env.append_unique('CXXFLAGS', ['-std=c++0x'])
+
+    autowaf.check_pkg(conf, 'lv2', uselib_store='LV2',
+                      atleast_version='1.2.0', mandatory=True)
+    autowaf.check_pkg(conf, 'glibmm-2.4', uselib_store='GLIBMM',
+                    atleast_version='2.14.0', mandatory=True)
+    autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD',
+                    atleast_version='2.14.0', mandatory=True)
+    autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM',
+                    atleast_version='2.12.0', mandatory=False)
+    autowaf.check_pkg(conf, 'jack', uselib_store='JACK',
+                      atleast_version='0.120.0', mandatory=True)
+    autowaf.check_pkg(conf, 'raul', uselib_store='RAUL',
+                    atleast_version='0.5.1', mandatory=True)
+    autowaf.check_pkg(conf, 'ganv-1', uselib_store='GANV',
+                    atleast_version='1.2.1', mandatory=False)
+    autowaf.check_pkg(conf, 'serd-0', uselib_store='SERD',
+                    atleast_version='0.4.0', mandatory=False)
+    autowaf.check_pkg(conf, 'sord-0', uselib_store='SORD',
+                    atleast_version='0.4.0', mandatory=False)
+    #autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
+    #               atleast_version='0.0.0', mandatory=False)
+
+    # Check for posix_memalign (OSX, amazingly, doesn't have it)
+    conf.check(function_name='posix_memalign',
+               header_name='stdlib.h',
+               define_name='HAVE_POSIX_MEMALIGN',
+               mandatory=False)
+
+    if conf.is_defined('HAVE_GTKMM') and conf.is_defined('HAVE_GANV'):
+        autowaf.define(conf, 'MACHINA_BUILD_GUI', 1)
+
+    autowaf.define(conf, 'MACHINA_PPQN', 19200)
+    autowaf.define(conf, 'MACHINA_VERSION', MACHINA_VERSION)
+    autowaf.define(conf, 'MACHINA_DATA_DIR',
+                   os.path.join(conf.env.DATADIR, 'machina'))
+
+    conf.write_config_header('machina_config.h', remove=False)
+
+    autowaf.display_msg(conf, "Jack", conf.is_defined('HAVE_JACK'))
+    autowaf.display_msg(conf, "GUI", conf.is_defined('MACHINA_BUILD_GUI'))
+    print('')
+
+def build(bld):
+    bld.recurse('src/engine')
+    bld.recurse('src/client')
+
+    if bld.is_defined('MACHINA_BUILD_GUI'):
+        bld.recurse('src/gui')
+
+def lint(ctx):
+    subprocess.call('cpplint.py --filter=-whitespace/comments,-whitespace/tab,-whitespace/braces,-whitespace/labels,-build/header_guard,-readability/casting,-readability/todo,-build/namespaces,-whitespace/line_length,-runtime/rtti,-runtime/references,-whitespace/blank_line,-runtime/sizeof,-readability/streams,-whitespace/operators,-whitespace/parens,-build/include,-build/storage_class `find -name *.cpp -or -name *.hpp`', shell=True)

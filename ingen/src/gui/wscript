@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+import waflib.Utils as Utils
+
+def build(bld):
+    obj = bld(features        = 'cxx cxxshlib',
+              export_includes = ['../..'],
+              includes        = ['../..'],
+              name            = 'libingen_gui',
+              target          = 'ingen_gui',
+              install_path    = '${LIBDIR}',
+              use             = 'libingen libingen_client libingen_serialisation')
+    autowaf.use_lib(bld, obj, '''
+            GANV
+            GLADEMM
+            GLIBMM
+            GNOMECANVAS
+            GTKMM
+            LILV
+            LV2
+            RAUL
+            SIGCPP
+            SORD
+            SOUP
+            SUIL
+            WEBKIT
+    ''')
+
+    obj.source = '''
+            App.cpp
+            Arc.cpp
+            BreadCrumbs.cpp
+            ConnectWindow.cpp
+            GraphBox.cpp
+            GraphCanvas.cpp
+            GraphPortModule.cpp
+            GraphTreeWindow.cpp
+            GraphView.cpp
+            GraphWindow.cpp
+            LoadGraphWindow.cpp
+            LoadPluginWindow.cpp
+            MessagesWindow.cpp
+            NewSubgraphWindow.cpp
+            NodeMenu.cpp
+            NodeModule.cpp
+            ObjectMenu.cpp
+            PluginMenu.cpp
+            Port.cpp
+            PortMenu.cpp
+            PropertiesWindow.cpp
+            RDFS.cpp
+            RenameWindow.cpp
+            Style.cpp
+            SubgraphModule.cpp
+            ThreadedLoader.cpp
+            WidgetFactory.cpp
+            Window.cpp
+            WindowFactory.cpp
+            ingen_gui.cpp
+    '''
+
+    # XML UI definition
+    bld(features      = 'subst',
+        source        = 'ingen_gui.ui',
+        target        = '../../ingen_gui.ui',
+        install_path  = '${DATADIR}/ingen',
+        chmod         = Utils.O755,
+        INGEN_VERSION = bld.env.INGEN_VERSION)
+
+    # LV2 UI
+    obj = bld(features     = 'cxx cxxshlib',
+              source       = 'ingen_gui_lv2.cpp',
+              includes     = ['.', '../..'],
+              name         = 'ingen_gui_lv2',
+              target       = 'ingen_gui_lv2',
+              install_path = '${LV2DIR}/ingen.lv2/',
+              use          = 'libingen libingen_gui')
+    autowaf.use_lib(bld, obj, 'LV2 SERD SORD GLIBMM GTKMM')

@@ -1,0 +1,163 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix midi: <http://lv2plug.in/ns/ext/midi#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix miai: <http://drobilla.net/plugins/miai/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
+
+miai:chan_mux
+	a lv2:Plugin ;
+	lv2:project miai: ;
+	lv2:microVersion 0 ;
+	lv2:minorVersion 0 ;
+	lv2:optionalFeature lv2:hardRTCapable ;
+	lv2:requiredFeature urid:map ;
+	lv2:port [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 0 ;
+		lv2:symbol "sys" ;
+		lv2:name "System"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 1 ;
+		lv2:symbol "ch1" ;
+		lv2:name "Channel 1"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 2 ;
+		lv2:symbol "ch2" ;
+		lv2:name "Channel 2"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 3 ;
+		lv2:symbol "ch3" ;
+		lv2:name "Channel 3"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 4 ;
+		lv2:symbol "ch4" ;
+		lv2:name "Channel 4"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 5 ;
+		lv2:symbol "ch5" ;
+		lv2:name "Channel 5"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 6 ;
+		lv2:symbol "ch6" ;
+		lv2:name "Channel 6"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 7 ;
+		lv2:symbol "ch7" ;
+		lv2:name "Channel 7"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 8 ;
+		lv2:symbol "ch8" ;
+		lv2:name "Channel 8"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 9 ;
+		lv2:symbol "ch9" ;
+		lv2:name "Channel 9"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 10 ;
+		lv2:symbol "ch10" ;
+		lv2:name "Channel 10"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 11 ;
+		lv2:symbol "ch11" ;
+		lv2:name "Channel 11"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 12 ;
+		lv2:symbol "ch12" ;
+		lv2:name "Channel 12"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 13 ;
+		lv2:symbol "ch13" ;
+		lv2:name "Channel 13"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 14 ;
+		lv2:symbol "ch14" ;
+		lv2:name "Channel 14"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 15 ;
+		lv2:symbol "ch15" ;
+		lv2:name "Channel 15"
+	] , [
+		a lv2:InputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 16 ;
+		lv2:symbol "ch16" ;
+		lv2:name "Channel 16"
+	] , [
+		a lv2:OutputPort ,
+			atom:AtomPort ;
+		atom:bufferType atom:Sequence ;
+		atom:supports midi:MidiEvent ;
+		lv2:index 17 ;
+		lv2:symbol "out" ;
+		lv2:name "Output"
+	] ;
+	doap:name "Channel Mux" ;
+	rdfs:comment "Multiplex the inputs into a single MIDI stream, where each input stream is forced to the corresponding channel.  The system and channel inputs drop voice and system messages, respective." .

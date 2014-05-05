@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+
+def build(bld):
+    obj = bld(features = 'cxx cxxshlib')
+    obj.source = '''
+            EdgeView.cpp
+            MachinaCanvas.cpp
+            MachinaGUI.cpp
+            NodePropertiesWindow.cpp
+            NodeView.cpp
+    '''
+
+    obj.includes        = ['.', '..', '../..', '../engine']
+    obj.export_includes = ['.']
+    obj.name            = 'libmachina_gui'
+    obj.target          = 'machina_gui'
+    obj.use             = 'libmachina_engine libmachina_client'
+    autowaf.use_lib(bld, obj, '''
+            GANV
+            GLADEMM
+            GLIBMM
+            GNOMECANVAS
+            GTKMM
+            RAUL
+            SORD
+            SIGCPP
+            EUGENE
+            LV2
+    ''')
+
+    # GUI runtime files
+    bld.install_files('${DATADIR}/machina', 'machina.ui')
+    bld.install_files('${DATADIR}/machina', 'machina.svg')
+
+    # Executable
+    obj = bld(features = 'cxx cxxprogram')
+    obj.target   = 'machina_gui'
+    obj.source   = 'main.cpp'
+    obj.includes = ['.', '../..', '../engine']
+    obj.defines  = 'VERSION="' + bld.env.MACHINA_VERSION + '"'
+    obj.use      = 'libmachina_engine libmachina_gui'
+    autowaf.use_lib(bld, obj, 'GTHREAD GLIBMM GTKMM SORD RAUL MACHINA EUGENE GANV LV2')

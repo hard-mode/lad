@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+import shutil
+
+# Version of this package (even if built as a child)
+FLOAT_VERSION = '0.0.0'
+
+# Variables for 'waf dist'
+APPNAME = 'float'
+VERSION = FLOAT_VERSION
+
+# Mandatory variables
+top = '.'
+out = 'build'
+
+def options(opt):
+    opt.load('compiler_c')
+    autowaf.set_options(opt)
+
+def configure(conf):
+    conf.load('compiler_c')
+    autowaf.configure(conf)
+    autowaf.display_header('Float Configuration')
+
+    # Check for required LV2 headers
+    autowaf.check_pkg(conf, 'lv2', atleast_version='1.0.0', uselib_store='LV2')
+
+    autowaf.check_pkg(conf, 'QtGui', uselib_store='QT4',
+                      atleast_version='4.0.0', mandatory=False)
+
+    # Set env.pluginlib_PATTERN
+    pat = conf.env.cshlib_PATTERN
+    if pat[0:3] == 'lib':
+        pat = pat[3:]
+    conf.env.pluginlib_PATTERN = pat
+
+    # Print summary
+    autowaf.display_msg(conf, "Qt4 GUI", conf.is_defined('HAVE_QT4'))
+    autowaf.display_msg(conf, "LV2 bundle directory",
+                        conf.env.LV2DIR)
+    print('')
+
+def build(bld):
+    # Plugin Library
+    penv = bld.env.derive()
+    penv.cshlib_PATTERN   = bld.env.pluginlib_PATTERN
+    penv.cxxshlib_PATTERN = bld.env.pluginlib_PATTERN
+    obj = bld(features     = 'c  cshlib',
+              env          = penv,
+              source       = 'float.c',
+              target       = 'float.lv2/float',
+              includes     = ['.'],
+              install_path = '${LV2DIR}/float.lv2',
+              uselib       = ['LV2'])
+
+    # Qt GUI
+    if bld.is_defined('HAVE_QT4'):
+        obj = bld(features     = 'cxx cxxshlib',
+                  env          = penv,
+                  source       = 'float_ui_qt.cpp',
+                  target       = 'float.lv2/float_ui_qt',
+                  install_path = '${LV2DIR}/float.lv2')
+        autowaf.use_lib(bld, obj, 'QT4')
+
+    for i in ['float.ttl', 'manifest.ttl']:
+        bld(features     = 'subst',
+            is_copy      = True,
+            source       = i,
+            target       = 'float.lv2/' + i,
+            install_path = '${LV2DIR}/float.lv2')

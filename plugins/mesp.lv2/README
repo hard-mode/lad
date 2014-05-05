@@ -1,0 +1,13 @@
+Mesp
+====
+
+Mesp (for Message Processing) is a set of LV2 plugins that process events.
+
+These plugins are for working with LV2 Atom messages, particularly "objects".
+An object or "resource" can be thought of as a set of properties, or a
+dictionary with URI keys.  Using these plugins, objects can be constructed,
+destructed, filtered, and analyzed, which allows for higher level programming
+using LV2 plugins as primitives.  These plugins are primarily useful in a
+modular environment such as Ingen.
+
+ -- David Robillard <d@drobilla.net>

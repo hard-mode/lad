@@ -1,0 +1,154 @@
+/*
+  Copyright 2007-2012 David Robillard <http://drobilla.net>
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+
+#define _XOPEN_SOURCE 500
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "jalv_config.h"
+#include "jalv_internal.h"
+
+#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
+
+static int
+print_usage(const char* name, bool error)
+{
+	FILE* const os = error ? stderr : stdout;
+	fprintf(os, "Usage: %s [OPTION...] PLUGIN_URI\n", name);
+	fprintf(os, "Run an LV2 plugin as a Jack application.\n");
+	fprintf(os, "  -h           Display this help and exit\n");
+	fprintf(os, "  -s           Show non-embedded UI if possible\n");
+	fprintf(os, "  -u UUID      UUID for Jack session restoration\n");
+	fprintf(os, "  -l DIR       Load state from save directory\n");
+	fprintf(os, "  -d DIR       Dump plugin <=> UI communication\n");
+	fprintf(os, "  -b SIZE      Buffer size for plugin <=> UI communication\n");
+	return error ? 1 : 0;
+}
+
+int
+jalv_ui_resize(Jalv* jalv, int width, int height)
+{
+	return 0;
+}
+
+void
+jalv_ui_port_event(Jalv*       jalv,
+                   uint32_t    port_index,
+                   uint32_t    buffer_size,
+                   uint32_t    protocol,
+                   const void* buffer)
+{
+}
+
+int
+jalv_init(int* argc, char*** argv, JalvOptions* opts)
+{
+	opts->controls    = malloc(sizeof(char*));
+	opts->controls[0] = NULL;
+
+	int n_controls = 0;
+	int a          = 1;
+	for (; a < *argc && (*argv)[a][0] == '-'; ++a) {
+		if ((*argv)[a][1] == 'h') {
+			return print_usage((*argv)[0], true);
+		} else if ((*argv)[a][1] == 's') {
+			opts->show_ui = true;
+		} else if ((*argv)[a][1] == 'u') {
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -u\n");
+				return 1;
+			}
+			opts->uuid = jalv_strdup((*argv)[a]);
+		} else if ((*argv)[a][1] == 'l') {
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -l\n");
+				return 1;
+			}
+			opts->load = jalv_strdup((*argv)[a]);
+		} else if ((*argv)[a][1] == 'b') {
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -b\n");
+				return 1;
+			}
+			opts->buffer_size = atoi((*argv)[a]);
+		} else if ((*argv)[a][1] == 'c') {
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -c\n");
+				return 1;
+			}
+			opts->controls = realloc(opts->controls,
+			                         (++n_controls + 1) * sizeof(char*));
+			opts->controls[n_controls - 1] = (*argv)[a];
+			opts->controls[n_controls]     = NULL;
+		} else if ((*argv)[a][1] == 'd') {
+			opts->dump = true;
+		} else {
+			fprintf(stderr, "Unknown option %s\n", (*argv)[a]);
+			return print_usage((*argv)[0], true);
+		}
+	}
+
+	return 0;
+}
+
+const char*
+jalv_native_ui_type(Jalv* jalv)
+{
+	return NULL;
+}
+
+int
+jalv_open_ui(Jalv* jalv)
+{
+	const LV2UI_Idle_Interface* idle_iface = NULL;
+	const LV2UI_Show_Interface* show_iface = NULL;
+	if (jalv->ui && jalv->opts.show_ui) {
+		jalv_ui_instantiate(jalv, jalv_native_ui_type(jalv), NULL);
+		idle_iface = (const LV2UI_Idle_Interface*)
+			suil_instance_extension_data(jalv->ui_instance, LV2_UI__idleInterface);
+		show_iface = (LV2UI_Show_Interface*)
+			suil_instance_extension_data(jalv->ui_instance, LV2_UI__showInterface);
+	}
+
+	if (show_iface && idle_iface) {
+		show_iface->show(suil_instance_get_handle(jalv->ui_instance));
+
+		// Drive idle interface until interrupted
+		while (!zix_sem_try_wait(jalv->done)) {
+			if (idle_iface->idle(suil_instance_get_handle(jalv->ui_instance))) {
+				break;
+			}
+			usleep(33333);
+		}
+
+		show_iface->hide(suil_instance_get_handle(jalv->ui_instance));
+
+		// Caller waits on the done sem, so increment it again to exit
+		zix_sem_post(jalv->done);
+	}
+
+	return 0;
+}
+
+int
+jalv_close_ui(Jalv* jalv)
+{
+	zix_sem_post(jalv->done);
+	return 0;
+}

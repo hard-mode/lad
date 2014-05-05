@@ -1,0 +1,13 @@
+BLOP.LV2
+========
+
+This is a port of the BLOP LADSPA plugins by Mike Rawes to LV2.
+
+This is a mostly faithful port of blop-0.2.8, except plugin variants have been
+eliminated via the use of morphable Control/CV ports.  This way, users do not
+have to choose from several versions of the same plugin, but the host can
+configure controls to be control-rate or audio-rate as appropriate.  This
+mechanism is backwards compatible, so these ports will simply appear as normal
+LV2 control ports in hosts that do not support port morphing.
+
+ -- David Robillard <d@drobilla.net>

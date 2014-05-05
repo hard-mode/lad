@@ -1,0 +1,30 @@
+@prefix mesp: <http://drobilla.net/plugins/mesp/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://drobilla.net/drobilla#me>
+	a foaf:Person ;
+	foaf:name "David Robillard" ;
+	foaf:mbox <mailto:d@drobilla.net> ;
+	rdfs:seeAlso <http://drobilla.net/drobilla> .
+
+mesp:
+	a doap:Project ;
+	lv2:symbol "mesp" ;
+	doap:name "Mesp LV2" ;
+	doap:shortdesc "A set of message processing plugins." ;
+	doap:homepage <http://drobilla.net/software/mesp> ;
+	doap:license <http://opensource.org/licenses/gpl-3.0> ;
+	doap:maintainer <http://drobilla.net/drobilla#me> .
+
+mesp:get
+	a lv2:Plugin ;
+	rdfs:seeAlso <get.ttl> ;
+	lv2:binary <get@LIB_EXT@> .
+
+mesp:log
+	a lv2:Plugin ;
+	rdfs:seeAlso <log.ttl> ;
+	lv2:binary <log@LIB_EXT@> .

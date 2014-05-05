@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+import os
+
+import waflib.Options as Options
+from waflib.extras import autowaf as autowaf
+
+# Version of this package (even if built as a child)
+DIRG_VERSION = '0.6.7'
+
+# Variables for 'waf dist'
+APPNAME = 'dirg'
+VERSION = DIRG_VERSION
+
+# Mandatory variables
+top = '.'
+out = 'build'
+
+def options(opt):
+    opt.load('compiler_cxx')
+    autowaf.set_options(opt)
+    opt.add_option('--no-http', action='store_true', default=False, dest='no_http',
+                    help="Do not build HTTP support, even if libsoup is available")
+
+def configure(conf):
+    conf.load('compiler_cxx')
+    autowaf.configure(conf)
+    autowaf.display_header('Dirg Configuration')
+
+    # Check for required LV2 headers
+    autowaf.check_pkg(conf, 'lv2', atleast_version='1.0.0', uselib_store='LV2')
+
+    # Check for libraries
+    autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD', mandatory=True)
+    autowaf.check_pkg(conf, 'libusb-1.0',  uselib_store='USB', mandatory=True)
+    autowaf.check_pkg(conf, 'sigc++-2.0',  uselib_store='SIGC', mandatory=True)
+
+    # Check for libsoup unless --no-http is given
+    if not Options.options.no_http:
+        autowaf.check_pkg(conf, 'libsoup-2.4', uselib_store='SOUP',
+                                          atleast_version='2.4.0', mandatory=False)
+
+    # Write config header
+    autowaf.define(conf, 'DIRG_VERSION', DIRG_VERSION)
+    autowaf.define(conf, 'DIRG_WITH_LAUNCHPAD', 1)
+    if conf.is_defined('HAVE_SOUP'):
+        autowaf.define(conf, 'DIRG_WITH_HTTP', 1)
+
+    conf.write_config_header('dirg_config.h', remove=False)
+
+    # Set env.pluginlib_PATTERN
+    pat = conf.env.cshlib_PATTERN
+    if pat[0:3] == 'lib':
+        pat = pat[3:]
+    conf.env.pluginlib_PATTERN = pat
+
+    # Print summary
+    autowaf.display_msg(conf, "Launchpad support", conf.env.DIRG_WITH_LAUNCHPAD == 1)
+    autowaf.display_msg(conf, "HTTP support", conf.env.DIRG_WITH_HTTP == 1)
+    print('')
+
+def build(bld):
+    dirg_source = '''
+            src/LaunchpadImpl.cpp
+            src/LaunchpadUI.cpp
+    '''
+
+    if bld.is_defined('DIRG_WITH_HTTP'):
+        dirg_source += 'src/WebUI.cpp'
+
+    # Stand-alone binary
+    bld(features     = 'cxx cxxprogram',
+        source       = dirg_source + ' src/dirg.cpp ',
+        target       = 'dirg.lv2/dirg',
+        includes     = ['.'],
+        uselib       = ['USB', 'SIGC', 'GTHREAD', 'SOUP'],
+        lib          = [ 'dl' ],
+        install_path = '${LV2DIR}/dirg.lv2')
+
+    # Plugin Library
+    penv = bld.env.derive()
+    penv.cxxshlib_PATTERN = bld.env.pluginlib_PATTERN
+    bld(features     = 'cxx cxxshlib',
+        env          = penv,
+        source       = dirg_source + ' src/LV2Plugin.cpp src/dirg_lv2.cpp ',
+        target       = 'dirg.lv2/dirg',
+        includes     = ['.'],
+        uselib       = ['USB', 'SIGC', 'GTHREAD', 'SOUP', 'LV2'],
+        install_path = '${LV2DIR}/dirg.lv2')
+
+    #rel_lv2dir = os.path.relpath(bld.env.LV2DIR, bld.env.BINDIR)
+    #bld.symlink_as('${BINDIR}/dirg', rel_lv2dir + '/dirg.lv2/dirg')
+
+    for i in ['dirg.ttl','manifest.ttl']:
+        bld(features     = 'subst',
+            source       = str(i),
+            target       = 'dirg.lv2/' + str(i),
+            install_path = '${LV2DIR}/dirg.lv2/' + os.path.dirname(str(i)))
+
+    for i in bld.path.ant_glob('www/*'):
+        path = 'www/' + str(i)
+        bld(rule         = 'cp ${SRC} ${TGT}',
+            source       = path,
+            target       = 'dirg.lv2/' + path,
+            install_path = '${LV2DIR}/dirg.lv2/' + os.path.dirname(path))

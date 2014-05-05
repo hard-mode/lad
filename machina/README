@@ -1,0 +1,15 @@
+Machina
+=======
+
+Machina is a MIDI sequencer based on Finite State Automata.
+
+A machine can be constructed manually from the user interface, recorded from
+MIDI input (free-form or step), or loaded from a MIDI file.  The probability of
+arcs can be manipulated to build a machine that produces structured but
+constantly changing output.  This way, Machina can be used as a generative
+recording tool that plays back patterns similar to, but not identical to, the
+original input.
+
+For more information, see <http://drobilla.net/software/machina>.
+
+ -- David Robillard <d@drobilla.net>

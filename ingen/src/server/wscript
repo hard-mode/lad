@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+
+def build(bld):
+    core_source = '''
+            ArcImpl.cpp
+            BlockFactory.cpp
+            BlockImpl.cpp
+            Broadcaster.cpp
+            Buffer.cpp
+            BufferFactory.cpp
+            Context.cpp
+            ControlBindings.cpp
+            DuplexPort.cpp
+            Engine.cpp
+            EventWriter.cpp
+            GraphImpl.cpp
+            InputPort.cpp
+            InternalPlugin.cpp
+            LV2Block.cpp
+            LV2Info.cpp
+            LV2Plugin.cpp
+            NodeImpl.cpp
+            OutputPort.cpp
+            PortImpl.cpp
+            PostProcessor.cpp
+            PreProcessor.cpp
+            Worker.cpp
+            events/Connect.cpp
+            events/CreateBlock.cpp
+            events/CreateGraph.cpp
+            events/CreatePort.cpp
+            events/Delete.cpp
+            events/Delta.cpp
+            events/Disconnect.cpp
+            events/DisconnectAll.cpp
+            events/Get.cpp
+            events/Move.cpp
+            events/SetPortValue.cpp
+            ingen_engine.cpp
+            internals/Controller.cpp
+            internals/Delay.cpp
+            internals/Note.cpp
+            internals/Time.cpp
+            internals/Trigger.cpp
+            mix.cpp
+    '''
+
+    obj = bld(features        = 'cxx cxxshlib',
+              source          = core_source,
+              export_includes = ['../..'],
+              includes        = ['.', '../..'],
+              name            = 'libingen_server',
+              target          = 'ingen_server',
+              install_path    = '${LIBDIR}',
+              use             = 'libingen')
+    core_libs = 'GLIBMM GTHREAD LV2 LILV RAUL SERD SORD'
+    autowaf.use_lib(bld, obj, core_libs)
+
+    if bld.env.BUILD_TESTS:
+        obj = bld(features        = 'cxx cxxshlib',
+                  source          = core_source,
+                  export_includes = ['../..'],
+                  includes        = ['.', '../..'],
+                  name            = 'libingen_server_profiled',
+                  target          = 'ingen_server_profiled',
+                  install_path    = '${LIBDIR}',
+                  use             = 'libingen_profiled',
+                  lib             = bld.env.INGEN_TEST_LIBS,
+                  cxxflags        = bld.env.INGEN_TEST_CXXFLAGS)
+        autowaf.use_lib(bld, obj, core_libs)
+
+    if bld.is_defined('HAVE_JACK'):
+        obj = bld(features        = 'cxx cxxshlib',
+                  source          = 'JackDriver.cpp ingen_jack.cpp',
+                  includes        = ['.', '../..'],
+                  name            = 'libingen_jack',
+                  target          = 'ingen_jack',
+                  install_path    = '${LIBDIR}',
+                  use             = 'libingen_server')
+        autowaf.use_lib(bld, obj, core_libs + ' JACK')
+
+    # Ingen LV2 wrapper
+    obj = bld(features     = 'cxx cxxshlib',
+              source       = ' ingen_lv2.cpp ',
+              includes     = ['.', '../..'],
+              name         = 'libingen_lv2',
+              target       = 'ingen_lv2',
+              install_path = '${LV2DIR}/ingen.lv2/',
+              use          = 'libingen libingen_server')
+    autowaf.use_lib(bld, obj, core_libs)

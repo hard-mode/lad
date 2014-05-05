@@ -1,0 +1,42 @@
+.TH JALV.GTK "19 Apr 2012"
+
+.SH NAME
+.B jalv.gtk \- Run an LV2 plugin as a JACK application (Gtk version).
+
+.SH SYNOPSIS
+.B jalv.gtk [OPTION]... PLUGIN_URI
+
+.SH OPTIONS
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print the command line options.
+
+.TP
+\fB\-u UUID\fR, \fB\-\-uuid UUID\fR
+UUID for Jack session restoration.
+
+.TP
+\fB\-l DIR\fR, \fB\-\-load DIR\fR
+Load state from state directory.
+
+.TP
+\fB\-d\fR, \fB\-\-dump\fR
+Dump plugin <=> UI communication.
+
+.TP
+\fB\-g\fR, \fB\-\-generic\-ui\fR
+Use Jalv generic UI and not the plugin UI
+
+.SH SEE ALSO
+.BR jalv(1),
+.BR jalv.gtkmm(1),
+.BR jalv.qt(2),
+.BR lv2ls(1),
+.BR jackd(1)
+
+.SH AUTHOR
+jalv was written by David Robillard <d@drobilla.net>
+.PP
+This manual page was written by Jaromír Mikes <mira.mikes@seznam.cz>
+and David Robillard <d@drobilla.net>

@@ -1,0 +1,13 @@
+fomp (1.0.1) unstable;
+
+  * Fix phaser plugin data and list phasers in manifest
+  * Add reverb and reverb_amb
+
+ -- David Robillard <d@drobilla.net>  Mon, 05 May 2014 11:42:01 +0200
+
+fomp (1.0.0) stable;
+
+  * Initial release
+
+ -- David Robillard <d@drobilla.net>  Sat, 27 Oct 2012 16:54:00 -0400
+

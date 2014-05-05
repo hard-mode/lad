@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+from waflib.extras import autowaf as autowaf
+import re
+
+MIAI_VERSION = '0.0.0'
+
+# Mandatory waf variables
+APPNAME = 'miai'        # Package name for waf dist
+VERSION = MIAI_VERSION  # Package version for waf dist
+top     = '.'           # Source directory
+out     = 'build'       # Build directory
+
+def options(opt):
+    opt.load('compiler_c')
+    autowaf.set_options(opt)
+
+def configure(conf):
+    conf.load('compiler_c')
+    autowaf.configure(conf)
+    autowaf.set_c99_mode(conf)
+    autowaf.display_header('Sampler Configuration')
+
+    autowaf.check_pkg(conf, 'sratom-0', uselib_store='SRATOM',
+                      atleast_version='0.2.0', mandatory=True)
+
+    if not autowaf.is_child():
+        autowaf.check_pkg(conf, 'lv2', atleast_version='1.4.0', uselib_store='LV2')
+
+    autowaf.display_msg(conf, 'LV2 bundle directory', conf.env.LV2DIR)
+    print('')
+
+def build(bld):
+    bundle = 'miai.lv2'
+
+    # Make a pattern for shared objects without the 'lib' prefix
+    module_pat = re.sub('^lib', '', bld.env.cshlib_PATTERN)
+    module_ext = module_pat[module_pat.rfind('.'):]
+
+    # Build manifest.ttl by substitution (for portable lib extension)
+    bld(features     = 'subst',
+        source       = '%s/manifest.ttl.in' % bundle,
+        target       = '%s/%s' % (bundle, 'manifest.ttl'),
+        install_path = '${LV2DIR}/%s' % bundle,
+        LIB_EXT      = module_ext)
+    
+    # Copy other data files to build bundle (build/eg-sampler.lv2)
+    for i in bld.path.ant_glob('%s/*.ttl' % bundle):
+        bld(features     = 'subst',
+            is_copy      = True,
+            source       = i,
+            target       = bld.path.get_bld().make_node('%s/%s' % (bundle, i)),
+            install_path = '${LV2DIR}/%s' % bundle)
+
+    # Use LV2 headers from parent directory if building as a sub-project
+    includes = ['.']
+    if autowaf.is_child:
+        includes += ['../..']
+
+    # Build plugin libraries
+    for i in ['chan_demux', 'chan_mux']:
+        obj = bld(features     = 'c cshlib',
+                  source       = 'src/%s.c' % i,
+                  name         = i,
+                  target       = '%s/%s' % (bundle, i),
+                  install_path = '${LV2DIR}/%s' % bundle,
+                  use          = 'LV2',
+                  includes     = includes)
+        autowaf.use_lib(bld, obj, 'SRATOM')
+        obj.env.cshlib_PATTERN = module_pat
