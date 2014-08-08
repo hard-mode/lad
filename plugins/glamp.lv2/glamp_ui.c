@@ -18,9 +18,6 @@
    @file glamp_ui.c Glamp.LV2 Plugin UI
 */
 
-#define _BSD_SOURCE 1
-#include <unistd.h>  /* for usleep */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

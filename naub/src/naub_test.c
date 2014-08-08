@@ -27,7 +27,7 @@ struct {
 } app;
 
 static void
-interrupt(int signal)
+interrupt(int signum)
 {
 	app.exit = 1;
 }
