@@ -191,7 +191,7 @@ typedef void (*PuglReshapeFunc)(PuglView* view, int width, int height);
    A function called on scrolling (e.g. mouse wheel or track pad).
 
    The distances used here are in "lines", a single tick of a clicking mouse
-   wheel.  For example, @p dy = 1.0 scrolls 1 line up.  Some systems and
+   wheel.  For example, `dy` = 1.0 scrolls 1 line up.  Some systems and
    devices support finer resolution and/or higher values for fast scrolls,
    so programs should handle any value gracefully.
 
