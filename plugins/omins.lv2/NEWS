@@ -1,4 +1,5 @@
-Omins: A collection of LADSPA plugins for modular synthesizers
+omins (0.0.0) unstable;
 
-Version 0.1.0 (12/05/2005): 
-	* Initial release
+  * Initial release
+
+ -- David Robillard <d@drobilla.net>  Fri, 09 Jun 2006 10:34:20 -0400
