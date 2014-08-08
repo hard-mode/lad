@@ -1,5 +1,5 @@
 /* LV2Extensions - Extension Mixins for LV2Plugin C++ wrapper class
- * Copyright 2009-2011 David Robillard <d@drobilla.net>
+ * Copyright 2009-2014 David Robillard <d@drobilla.net>
  * Copyright 2006-2007 Lars Luthman <lars.luthman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -29,7 +29,7 @@ namespace LV2 {
 namespace Ext {
 
 /** The fixed buffer size extension. A host that supports this will always
- *  call the plugin's run() function with the same @c sample_count parameter,
+ *  call the plugin's run() function with the same `sample_count` parameter,
  *  which will be equal to the uint32_t variable pointed to by the data
  *  pointer for this feature. */
 template<bool Required>

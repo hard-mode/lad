@@ -32,7 +32,7 @@ namespace machina {
 
 /** Create a new SMF writer.
  *
- * @a unit must match the time stamp of ALL events passed to write, or
+ * @param unit Must match the time stamp of ALL events passed to write, or
  * terrible things will happen.
  *
  * *** NOTE: Only beat time is implemented currently.
@@ -59,9 +59,9 @@ SMFWriter::~SMFWriter()
 
 /** Start a write to an SMF file.
  *
- * @a filename Filename to write to.
- * @a start_time Beat time corresponding to t=0 in the file (timestamps passed
- *    to write_event will have this value subtracted before writing).
+ * @param filename Filename to write to.
+ * @param start_time Beat time corresponding to t=0 in the file (timestamps
+ *    passed to write_event will have this value subtracted before writing).
  */
 bool
 SMFWriter::start(const std::string& filename,
@@ -90,9 +90,9 @@ SMFWriter::start(const std::string& filename,
 
 /** Write an event at the end of the file.
  *
- * @a time is the absolute time of the event, relative to the start of the file
- *    (the start_time parameter to start).  Must be monotonically increasing on
- *    successive calls to this method.
+ * @param time The absolute time of the event, relative to the start of the
+ * file (the start_time parameter to start).  Must be monotonically increasing
+ * on successive calls to this method.
  */
 void
 SMFWriter::write_event(Raul::TimeStamp      time,

@@ -39,9 +39,9 @@ SMFDriver::SMFDriver(Forge& forge, Raul::TimeUnit unit)
 	_writer = SPtr<SMFWriter>(new SMFWriter(unit));
 }
 
-/** Learn a single track from the MIDI file at @a uri
+/** Learn a single track from the MIDI file at `uri`
  *
- * @track selects which track of the MIDI file to import, starting from 1.
+ * @param track The track of the MIDI file to import, starting from 1.
  *
  * Currently only file:// URIs are supported.
  * @return the resulting machine.

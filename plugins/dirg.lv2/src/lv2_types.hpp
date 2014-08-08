@@ -51,8 +51,8 @@ struct End {
  *  from a parameter list. It is inherited by the Plugin class to make
  *  it possible to add overridable extension functions to the class.
  *  The first template parameter will be used as the first template
- *  parameter of @c E1, and also be passed as the first parameter of the
- *  next level of the inheritance tree. Each @c bool parameter will be used
+ *  parameter of `E1`, and also be passed as the first parameter of the
+ *  next level of the inheritance tree. Each `bool` parameter will be used
  *  as the second parameter to the template directly preceding it.
  */
 template<class A,
@@ -65,7 +65,7 @@ struct MixinTree
 	typedef MixinTree<A, E2, E3, E4, E5, E6, E7, E8> Parent;
 
 	/** @internal
-	 *  Add feature handlers to @c hmap for the feature URIs.
+	 *  Add feature handlers to `hmap` for the feature URIs.
 	 */
 	static void map_feature_handlers(FeatureHandlers& hmap) {
 		E1::template I<A>::map_feature_handlers(hmap);
@@ -108,7 +108,7 @@ struct Extension {
 	/** Default implementation does nothing - no handlers added. */
 	static void map_feature_handlers(FeatureHandlers& hmap) {}
 
-	/** Return @c true if the plugin instance is OK, @c false if it isn't. */
+	/** Return `true` if the plugin instance is OK, `false` if it isn't. */
 	bool check_ok() const { return m_ok; }
 
 	/** Return a data pointer corresponding to the URI if this extension

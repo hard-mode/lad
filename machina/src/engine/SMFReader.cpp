@@ -203,7 +203,7 @@ SMFReader::seek_to_track(unsigned track) throw (std::logic_error)
  * Returns event length (including status byte) on success, 0 if event was
  * skipped (eg a meta event), or -1 on EOF (or end of track).
  *
- * If @a buf is not large enough to hold the event, 0 will be returned, but ev_size
+ * If `buf` is not large enough to hold the event, 0 will be returned, but ev_size
  * set to the actual size of the event.
  */
 int

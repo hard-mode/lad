@@ -70,7 +70,7 @@ public:
 static unsigned _ = MyLV2::register_class<MyLV2>("http://example.org/my-lv2");
 </code>
  *
- * If the above code is compiled and linked with @c -llv2_plugin into a shared
+ * If the above code is compiled and linked with `-llv2_plugin` into a shared
  * module, that shared module will be a valid LV2 plugin binary containing a
  * single pass-through audio plugin with URI <http://example.org/my-lv2>.
  */

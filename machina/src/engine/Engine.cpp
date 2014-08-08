@@ -56,7 +56,7 @@ Engine::new_driver(Forge&             forge,
 	return SPtr<Driver>();
 }
 
-/** Load the machine at @a uri, and run it (replacing current machine).
+/** Load the machine at `uri`, and run it (replacing current machine).
  * Safe to call while engine is processing.
  */
 SPtr<Machine>
@@ -72,7 +72,7 @@ Engine::load_machine(const Glib::ustring& uri)
 	return machine;
 }
 
-/** Build a machine from the MIDI at @a uri, and run it (replacing current machine).
+/** Build a machine from the MIDI at `uri`, and run it (replacing current machine).
  * Safe to call while engine is processing.
  */
 SPtr<Machine>
