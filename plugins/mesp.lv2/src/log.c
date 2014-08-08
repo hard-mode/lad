@@ -120,7 +120,7 @@ run(LV2_Handle instance,
 		char* str = sratom_to_turtle(
 			self->sratom, self->unmap, "urn:log/", &s, &p,
 			ev->body.type, ev->body.size, LV2_ATOM_BODY(&ev->body));
-		lv2_log_note(&self->logger, str);
+		lv2_log_note(&self->logger, "%s", str);
 	}
 }
 
