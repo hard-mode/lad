@@ -19,7 +19,7 @@ def options(opt):
 
 def configure(conf):
     conf.load('compiler_c')
-    if Options.platform == 'win32':
+    if conf.env.DEST_OS == 'win32':
         conf.load('compiler_cxx')
 
     autowaf.configure(conf)
@@ -45,12 +45,12 @@ def build(bld):
     ui_framework = []
     ui_libs      = []
     ui_lang      = 'c'
-    if Options.platform == 'win32':
+    if bld.env.DEST_OS == 'win32':
         pugl_impl = 'pugl/pugl_win.cpp'
         ui_type   = 'http://lv2plug.in/ns/extensions/ui#WindowsUI'
         ui_libs   = ['opengl32', 'glu32', 'gdi32', 'user32']
         ui_lang   = 'cxx'
-    elif Options.platform == 'darwin':
+    elif bld.env.DEST_OS == 'darwin':
         pugl_impl    = 'pugl/pugl_osx.m'
         ui_type      = 'http://lv2plug.in/ns/extensions/ui#CocoaUI'
         ui_framework = ['Cocoa', 'OpenGL']
