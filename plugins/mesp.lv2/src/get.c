@@ -71,7 +71,7 @@ instantiate(const LV2_Descriptor*     descriptor,
             const char*               bundle_path,
             const LV2_Feature* const* features)
 {
-	Get* self = (Get*)malloc(sizeof(Get));
+	Get* self = (Get*)calloc(1, sizeof(Get));
 	if (!self) {
 		return NULL;
 	}
