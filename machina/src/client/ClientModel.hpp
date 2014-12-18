@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@
 
 #include <sigc++/sigc++.h>
 
+#include "machina/Model.hpp"
+
 #include "ClientObject.hpp"
 
 namespace Raul {
@@ -30,14 +32,18 @@ class Atom;
 namespace machina {
 namespace client {
 
-class ClientModel
+class ClientModel : public Model
 {
 public:
-	void new_object(SPtr<ClientObject> object);
-	void erase_object(uint64_t id);
-	void property(uint64_t id, URIInt key, const Atom& value);
+	void new_object(uint64_t id, const Properties& properties);
 
-	SPtr<ClientObject> find(uint64_t id);
+	void erase_object(uint64_t id);
+
+	SPtr<ClientObject>       find(uint64_t id);
+	SPtr<const ClientObject> find(uint64_t id) const;
+
+	void        set(uint64_t id, URIInt key, const Atom& value);
+	const Atom& get(uint64_t id, URIInt key) const;
 
 	sigc::signal< void, SPtr<ClientObject> > signal_new_object;
 	sigc::signal< void, SPtr<ClientObject> > signal_erase_object;

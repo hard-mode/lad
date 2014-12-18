@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -80,13 +80,13 @@ main(int argc, char** argv)
 		machine = SPtr<Machine>(new Machine(beats));
 	}
 
-	std::string driver_name = "smf";
-#ifdef HAVE_JACK
-	driver_name = "jack";
-#endif
+	// Create driver
+	SPtr<Driver> driver(Engine::new_driver(forge, "jack", machine));
+	if (!driver) {
+		cerr << "warning: Failed to create Jack driver, using SMF" << endl;
+		driver = SPtr<Driver>(Engine::new_driver(forge, "smf", machine));
+	}
 
-	// Build engine
-	SPtr<Driver> driver(Engine::new_driver(forge, driver_name, machine));
 	SPtr<Engine> engine(new Engine(forge, driver, rdf_world));
 
 	Gtk::Main app(argc, argv);

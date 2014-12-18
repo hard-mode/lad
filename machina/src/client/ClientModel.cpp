@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -31,13 +31,31 @@ ClientModel::find(uint64_t id)
 	}
 }
 
-void
-ClientModel::new_object(SPtr<ClientObject> object)
+SPtr<const ClientObject>
+ClientModel::find(uint64_t id) const
 {
-	Objects::iterator i = _objects.find(object);
+	SPtr<ClientObject> key(new ClientObjectKey(id));
+	Objects::const_iterator  i = _objects.find(key);
+	if (i != _objects.end()) {
+		return *i;
+	} else {
+		return SPtr<ClientObject>();
+	}
+}
+
+void
+ClientModel::new_object(uint64_t id, const Properties& properties)
+{
+	SPtr<ClientObject> key(new ClientObjectKey(id));
+	Objects::iterator i = _objects.find(key);
 	if (i == _objects.end()) {
+		SPtr<ClientObject> object(new ClientObject(id, properties));
 		_objects.insert(object);
 		signal_new_object.emit(object);
+	} else {
+		for (const auto& p : properties) {
+			(*i)->set(p.first, p.second);
+		}
 	}
 }
 
@@ -56,12 +74,20 @@ ClientModel::erase_object(uint64_t id)
 }
 
 void
-ClientModel::property(uint64_t id, URIInt key, const Atom& value)
+ClientModel::set(uint64_t id, URIInt key, const Atom& value)
 {
 	SPtr<ClientObject> object = find(id);
 	if (object) {
 		object->set(key, value);
 	}
+}
+
+const Atom&
+ClientModel::get(uint64_t id, URIInt key) const
+{
+	static const Atom null_atom;
+	SPtr<const ClientObject> object = find(id);
+	return object ? object->get(key) : null_atom;
 }
 
 }

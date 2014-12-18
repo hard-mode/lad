@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,9 @@
 #include "raul/RingBuffer.hpp"
 #include "raul/Maid.hpp"
 
-#include "machina/types.hpp"
+#include "machina/Model.hpp"
 #include "machina/URIs.hpp"
+#include "machina/types.hpp"
 
 #include "Stateful.hpp"
 
@@ -37,19 +38,13 @@ namespace machina {
 
 class Engine;
 class Machine;
-class Stateful;
-
-namespace client {
-class ClientModel;
-class ClientObject;
-}
 
 class Controller
 {
 public:
-	Controller(SPtr<Engine> engine, client::ClientModel& client_model);
+	Controller(SPtr<Engine> engine, Model& model);
 
-	uint64_t create(const client::ClientObject& obj);
+	uint64_t create(const Properties& properties);
 	uint64_t connect(uint64_t tail_id, uint64_t head_id);
 
 	void set_property(uint64_t object_id, URIInt key, const Atom& value);
@@ -74,8 +69,8 @@ private:
 	typedef std::set<SPtr<Stateful>, StatefulComparator> Objects;
 	Objects _objects;
 
-	SPtr<Engine>         _engine;
-	client::ClientModel& _client_model;
+	SPtr<Engine> _engine;
+	Model&       _model;
 
 	SPtr<Raul::RingBuffer> _updates;
 };

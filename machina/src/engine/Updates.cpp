@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,7 @@ read_set(SPtr<Raul::RingBuffer> buf,
          URIInt*                key,
          Atom*                  value)
 {
-	uint32_t update_type;
+	uint32_t update_type = 0;
 	buf->read(sizeof(update_type), &update_type);
 	if (update_type != UPDATE_SET) {
 		return 0;
@@ -53,7 +53,7 @@ read_set(SPtr<Raul::RingBuffer> buf,
 	buf->read(sizeof(*subject), subject);
 	buf->read(sizeof(*key), key);
 
-	LV2_Atom atom;
+	LV2_Atom atom = { 0, 0 };
 	buf->read(sizeof(LV2_Atom), &atom);
 	*value = Atom(atom.size, atom.type, NULL);
 	buf->read(atom.size, value->get_body());

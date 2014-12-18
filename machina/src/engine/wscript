@@ -23,7 +23,7 @@ def build(bld):
             Updates.cpp
             URIs.cpp
     '''
-    if bld.is_defined('HAVE_EUGENE'):
+    if bld.env.HAVE_EUGENE:
         core_source += '''
                 Evolver.cpp
                 Problem.cpp
@@ -35,7 +35,7 @@ def build(bld):
     obj.name     = 'libmachina_engine'
     obj.target   = 'machina_engine'
     core_libs = 'RAUL GLIBMM GTHREAD RAUL SERD SORD JACK LV2'
-    if bld.is_defined('HAVE_EUGENE'):
+    if bld.env.HAVE_EUGENE:
         core_libs += ' EUGENE '
     autowaf.use_lib(bld, obj, core_libs)
 

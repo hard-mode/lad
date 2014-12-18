@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@
 #ifndef MACHINA_TYPES_HPP
 #define MACHINA_TYPES_HPP
 
+#include <map>
 #include <memory>
 
 #include "raul/RingBuffer.hpp"
@@ -26,6 +27,9 @@ namespace machina {
 typedef unsigned char byte;
 
 typedef uint32_t URIInt;
+
+class Atom;
+typedef std::map<URIInt, Atom> Properties;
 
 #if __cplusplus >= 201103L
 template <class T>

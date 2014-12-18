@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -182,14 +182,17 @@ MachinaCanvas::on_erase_object(SPtr<client::ClientObject> object)
 void
 MachinaCanvas::action_create_node(double x, double y)
 {
-	machina::client::ClientObject obj(0);
-	obj.set(URIs::instance().rdf_type,
-	        _app->forge().make_urid(URIs::instance().machina_Node));
-	obj.set(URIs::instance().machina_canvas_x, _app->forge().make((float)x));
-	obj.set(URIs::instance().machina_canvas_y, _app->forge().make((float)y));
-	obj.set(URIs::instance().machina_duration,
-	        _app->forge().make((float)_app->default_length()));
-	_app->controller()->create(obj);
+	const Properties props = {
+		{ URIs::instance().rdf_type,
+		  _app->forge().make_urid(URIs::instance().machina_Node) },
+		{ URIs::instance().machina_canvas_x,
+		  _app->forge().make((float)x) },
+		{ URIs::instance().machina_canvas_y,
+		  _app->forge().make((float)y) },
+		{ URIs::instance().machina_duration,
+		  _app->forge().make((float)_app->default_length()) } };
+
+	_app->controller()->create(props);
 }
 
 void

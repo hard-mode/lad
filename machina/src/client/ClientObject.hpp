@@ -1,6 +1,6 @@
 /*
   This file is part of Machina.
-  Copyright 2007-2013 David Robillard <http://drobilla.net>
+  Copyright 2007-2014 David Robillard <http://drobilla.net>
 
   Machina is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ namespace client {
 class ClientObject
 {
 public:
-	explicit ClientObject(uint64_t id);
+	explicit ClientObject(uint64_t id, const Properties& properties={});
 	ClientObject(const ClientObject& copy, uint64_t id);
 
 	inline uint64_t id() const { return _id; }
