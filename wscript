@@ -27,7 +27,6 @@ projects = '''
     machina
     naub
     plugins/float.lv2
-    plugins/values.lv2
     plugins/mda.lv2
     plugins/matriseq
     plugins/blop.lv2
