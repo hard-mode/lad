@@ -42,7 +42,7 @@ def configure(conf):
     # Write config header
     autowaf.define(conf, 'DIRG_VERSION', DIRG_VERSION)
     autowaf.define(conf, 'DIRG_WITH_LAUNCHPAD', 1)
-    if conf.is_defined('HAVE_SOUP'):
+    if conf.env.HAVE_SOUP:
         autowaf.define(conf, 'DIRG_WITH_HTTP', 1)
 
     conf.write_config_header('dirg_config.h', remove=False)
@@ -54,8 +54,8 @@ def configure(conf):
     conf.env.pluginlib_PATTERN = pat
 
     # Print summary
-    autowaf.display_msg(conf, "Launchpad support", conf.env.DIRG_WITH_LAUNCHPAD == 1)
-    autowaf.display_msg(conf, "HTTP support", conf.env.DIRG_WITH_HTTP == 1)
+    autowaf.display_msg(conf, "Launchpad support", conf.is_defined('DIRG_WITH_LAUNCHPAD'))
+    autowaf.display_msg(conf, "HTTP support", conf.is_defined('DIRG_WITH_HTTP'))
     print('')
 
 def build(bld):

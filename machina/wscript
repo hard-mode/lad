@@ -55,7 +55,7 @@ def configure(conf):
                define_name='HAVE_POSIX_MEMALIGN',
                mandatory=False)
 
-    if conf.is_defined('HAVE_GTKMM') and conf.is_defined('HAVE_GANV'):
+    if conf.env.HAVE_GTKMM and conf.env.HAVE_GANV:
         autowaf.define(conf, 'MACHINA_BUILD_GUI', 1)
 
     autowaf.define(conf, 'MACHINA_PPQN', 19200)
@@ -65,15 +65,15 @@ def configure(conf):
 
     conf.write_config_header('machina_config.h', remove=False)
 
-    autowaf.display_msg(conf, "Jack", conf.is_defined('HAVE_JACK'))
-    autowaf.display_msg(conf, "GUI", conf.is_defined('MACHINA_BUILD_GUI'))
+    autowaf.display_msg(conf, "Jack", bool(conf.env.HAVE_JACK))
+    autowaf.display_msg(conf, "GUI", bool(conf.env.MACHINA_BUILD_GUI))
     print('')
 
 def build(bld):
     bld.recurse('src/engine')
     bld.recurse('src/client')
 
-    if bld.is_defined('MACHINA_BUILD_GUI'):
+    if bld.env.MACHINA_BUILD_GUI:
         bld.recurse('src/gui')
 
 def lint(ctx):

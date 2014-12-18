@@ -74,7 +74,8 @@ def build(bld):
               name         = 'glamp',
               target       = '%s/glamp' % bundle,
               install_path = '${LV2DIR}/%s' % bundle,
-              use          = 'LV2_1_4_1')
+              use          = 'LV2_1_4_1',
+              lib          = ['m'])
     obj.env.cshlib_PATTERN = module_pat
 
     # Build UI library
@@ -83,7 +84,7 @@ def build(bld):
               name         = 'glamp_ui',
               target       = '%s/glamp_ui' % bundle,
               install_path = '${LV2DIR}/%s' % bundle,
-              lib          = ui_libs + ['pthread'],
+              lib          = ui_libs + ['m', 'pthread'],
               framework    = ui_framework,
               use          = 'LV2_1_4_1')
     obj.env['%sshlib_PATTERN' % ui_lang] = module_pat

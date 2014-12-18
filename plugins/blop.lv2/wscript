@@ -45,13 +45,12 @@ def configure(conf):
 
     conf.define('BLOP_SHLIB_EXT', conf.env.pluginlib_EXT)
 
-    autowaf.display_msg(conf, 'LV2 bundle directory',
-                        conf.env.LV2DIR)
+    autowaf.display_msg(conf, 'LV2 bundle directory', conf.env.LV2DIR)
     autowaf.display_msg(conf, 'Ideal oscillator sampling rate',
                         Options.options.rate)
     print('')
 
-def build_plugin(bld, lang, bundle, name, source, defines=None):
+def build_plugin(bld, lang, bundle, name, source, defines=None, lib=[]):
     # Build plugin library
     penv = bld.env.derive()
     penv.cshlib_PATTERN = bld.env.pluginlib_PATTERN
@@ -62,6 +61,7 @@ def build_plugin(bld, lang, bundle, name, source, defines=None):
               name         = name,
               target       = os.path.join(bundle, name),
               uselib       = ['LV2'],
+              lib          = ['m'] + lib,
               install_path = '${LV2DIR}/' + bundle)
     if defines != None:
         obj.defines = defines
@@ -114,7 +114,8 @@ def build(bld):
     # Oscillators
     for i in ['pulse', 'sawtooth', 'square', 'triangle']:
         build_plugin(bld, 'c', 'blop.lv2', i,
-                     ['src/%s.c' % i, 'src/wavedata.c'])
+                     ['src/%s.c' % i, 'src/wavedata.c'],
+                     lib=['dl'])
 
     # Sequencers
     for i in [16, 32, 64]:

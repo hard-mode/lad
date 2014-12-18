@@ -35,9 +35,8 @@ def configure(conf):
     conf.env.pluginlib_PATTERN = pat
 
     # Print summary
-    autowaf.display_msg(conf, "Qt4 GUI", conf.is_defined('HAVE_QT4'))
-    autowaf.display_msg(conf, "LV2 bundle directory",
-                        conf.env.LV2DIR)
+    autowaf.display_msg(conf, "Qt4 GUI", bool(conf.env.HAVE_QT4))
+    autowaf.display_msg(conf, "LV2 bundle directory", conf.env.LV2DIR)
     print('')
 
 def build(bld):
@@ -54,7 +53,7 @@ def build(bld):
               uselib       = ['LV2'])
 
     # Qt GUI
-    if bld.is_defined('HAVE_QT4'):
+    if bld.env.HAVE_QT4:
         obj = bld(features     = 'cxx cxxshlib',
                   env          = penv,
                   source       = 'float_ui_qt.cpp',

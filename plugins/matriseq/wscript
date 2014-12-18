@@ -69,6 +69,7 @@ def build(bld):
               name         = 'matriseq',
               target       = '%s/matriseq' % bundle,
               install_path = '${LV2DIR}/%s' % bundle,
-              includes     = ['.'])
+              includes     = ['.'],
+              lib          = ['pthread'])
     autowaf.use_lib(bld, obj, 'LV2 NAUB')
 
