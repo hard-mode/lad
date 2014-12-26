@@ -382,6 +382,16 @@ activate_port(Jalv*    jalv,
 			port->jack_port = jack_port_register(
 				jalv->jack_client, lilv_node_as_string(sym),
 				JACK_DEFAULT_MIDI_TYPE, jack_flags, 0);
+		} else if (lilv_port_supports_event(
+			    jalv->plugin, port->lilv_port, jalv->nodes.osc_OscEvent)) {
+			port->jack_port = jack_port_register(
+				jalv->jack_client, lilv_node_as_string(sym),
+				JACK_DEFAULT_MIDI_TYPE, jack_flags, 0);
+#ifdef HAVE_JACK_METADATA
+		jack_set_property(
+			jalv->jack_client, jack_port_uuid(port->jack_port),
+			"http://jackaudio.org/metadata/event-types", "OSC", "text/plain");
+#endif
 		}
 		break;
 	default:
@@ -393,7 +403,7 @@ activate_port(Jalv*    jalv,
 		LilvNode* name = lilv_port_get_name(jalv->plugin, port->lilv_port);
 		jack_set_property(
 			jalv->jack_client, jack_port_uuid(port->jack_port),
-			JACK_METADATA_PRETTY_NAME, lilv_node_as_string(name), NULL);
+			JACK_METADATA_PRETTY_NAME, lilv_node_as_string(name), "text/plain");
 		lilv_node_free(name);
 	}
 #endif
@@ -522,6 +532,8 @@ jack_process_cb(jack_nframes_t nframes, void* data)
 			}
 
 			if (port->jack_port) {
+				int is_osc = lilv_port_supports_event(
+			    jalv->plugin, port->lilv_port, jalv->nodes.osc_OscEvent);
 				/* Write Jack MIDI input */
 				void* buf = jack_port_get_buffer(port->jack_port, nframes);
 				for (uint32_t i = 0; i < jack_midi_get_event_count(buf); ++i) {
@@ -529,7 +541,7 @@ jack_process_cb(jack_nframes_t nframes, void* data)
 					jack_midi_event_get(&ev, buf, i);
 					lv2_evbuf_write(&iter,
 					                ev.time, 0,
-					                jalv->midi_event_id,
+					                is_osc ? jalv->osc_event_id : jalv->midi_event_id,
 					                ev.size, ev.buffer);
 				}
 			}
@@ -603,7 +615,7 @@ jack_process_cb(jack_nframes_t nframes, void* data)
 				uint32_t frames, subframes, type, size;
 				uint8_t* body;
 				lv2_evbuf_get(i, &frames, &subframes, &type, &size, &body);
-				if (buf && type == jalv->midi_event_id) {
+				if (buf && (type == jalv->midi_event_id || type == jalv->osc_event_id) ) {
 					jack_midi_event_write(buf, frames, body, size);
 				}
 
@@ -908,6 +920,8 @@ main(int argc, char** argv)
 
 	jalv.midi_event_id = uri_to_id(
 		&jalv, "http://lv2plug.in/ns/ext/event", LV2_MIDI__MidiEvent);
+	jalv.osc_event_id = uri_to_id(
+		&jalv, "http://lv2plug.in/ns/ext/event", "http://opensoundcontrol.org#OscEvent");
 
 	jalv.urids.atom_Float           = symap_map(jalv.symap, LV2_ATOM__Float);
 	jalv.urids.atom_Int             = symap_map(jalv.symap, LV2_ATOM__Int);
@@ -917,6 +931,7 @@ main(int argc, char** argv)
 	jalv.urids.bufsz_sequenceSize   = symap_map(jalv.symap, LV2_BUF_SIZE__sequenceSize);
 	jalv.urids.log_Trace            = symap_map(jalv.symap, LV2_LOG__Trace);
 	jalv.urids.midi_MidiEvent       = symap_map(jalv.symap, LV2_MIDI__MidiEvent);
+	jalv.urids.osc_OscEvent         = symap_map(jalv.symap, "http://opensoundcontrol.org#OscEvent");
 	jalv.urids.param_sampleRate     = symap_map(jalv.symap, LV2_PARAMETERS__sampleRate);
 	jalv.urids.patch_Set            = symap_map(jalv.symap, LV2_PATCH__Set);
 	jalv.urids.patch_property       = symap_map(jalv.symap, LV2_PATCH__property);
@@ -977,6 +992,7 @@ main(int argc, char** argv)
 	jalv.nodes.lv2_control            = lilv_new_uri(world, LV2_CORE__control);
 	jalv.nodes.lv2_name               = lilv_new_uri(world, LV2_CORE__name);
 	jalv.nodes.midi_MidiEvent         = lilv_new_uri(world, LV2_MIDI__MidiEvent);
+	jalv.nodes.osc_OscEvent           = lilv_new_uri(world, "http://opensoundcontrol.org#OscEvent");
 	jalv.nodes.pg_group               = lilv_new_uri(world, LV2_PORT_GROUPS__group);
 	jalv.nodes.pset_Preset            = lilv_new_uri(world, LV2_PRESETS__Preset);
 	jalv.nodes.rdfs_label             = lilv_new_uri(world, LILV_NS_RDFS "label");

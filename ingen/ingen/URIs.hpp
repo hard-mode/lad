@@ -129,6 +129,7 @@ public:
 	const Quark midi_controllerNumber;
 	const Quark midi_noteNumber;
 	const Quark morph_currentType;
+	const Quark osc_OscEvent;
 	const Quark param_sampleRate;
 	const Quark patch_Delete;
 	const Quark patch_Get;

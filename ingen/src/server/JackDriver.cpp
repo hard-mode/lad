@@ -66,6 +66,7 @@ JackDriver::JackDriver(Engine& engine)
 	, _old_rolling(false)
 {
 	_midi_event_type = _engine.world()->uris().midi_MidiEvent;
+	_osc_event_type = _engine.world()->uris().osc_OscEvent;
 	lv2_atom_forge_init(
 		&_forge, &engine.world()->uri_map().urid_map_feature()->urid_map);
 }
@@ -289,6 +290,11 @@ JackDriver::port_property_internal(const jack_port_t* jport,
 			jack_set_property(_client, jack_port_uuid(jport),
 			                  JACKEY_SIGNAL_TYPE, "CV", "text/plain");
 		}
+	} else if (uri == _engine.world()->uris().atom_supports) {
+		if (value == _engine.world()->uris().osc_OscEvent) {
+			jack_set_property(_client, jack_port_uuid(jport),
+			                  JACKEY_EVENT_TYPES, "OSC", "text/plain");
+		}
 	}
 #endif
 }
@@ -338,13 +344,19 @@ JackDriver::pre_process_port(ProcessContext& context, EnginePort* port)
 
 		graph_buf->prepare_write(context);
 
+		uint32_t _event_type;
+		if(graph_port->supports(graph_port->bufs().uris().osc_OscEvent) )
+			_event_type = _osc_event_type;
+		else
+			_event_type = _midi_event_type;
+
 		// Copy events from Jack port buffer into graph port buffer
 		for (jack_nframes_t i = 0; i < event_count; ++i) {
 			jack_midi_event_t ev;
 			jack_midi_event_get(&ev, buffer, i);
 
 			if (!graph_buf->append_event(
-				    ev.time, ev.size, _midi_event_type, ev.buffer)) {
+				    ev.time, ev.size, _event_type, ev.buffer)) {
 				_engine.log().warn("Failed to write to MIDI buffer, events lost!\n");
 			}
 		}
@@ -378,7 +390,8 @@ JackDriver::post_process_port(ProcessContext& context, EnginePort* port)
 		LV2_Atom_Sequence* seq = (LV2_Atom_Sequence*)graph_buf->atom();
 		LV2_ATOM_SEQUENCE_FOREACH(seq, ev) {
 			const uint8_t* buf = (const uint8_t*)LV2_ATOM_BODY(&ev->body);
-			if (ev->body.type == graph_port->bufs().uris().midi_MidiEvent) {
+			if ( (ev->body.type == graph_port->bufs().uris().midi_MidiEvent)
+				 ||(ev->body.type == graph_port->bufs().uris().osc_OscEvent) ) {
 				jack_midi_event_write(buffer, ev->time.frames, buf, ev->body.size);
 			}
 		}

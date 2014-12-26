@@ -145,6 +145,7 @@ protected:
 	jack_nframes_t         _block_length;
 	jack_nframes_t         _sample_rate;
 	uint32_t               _midi_event_type;
+	uint32_t               _osc_event_type;
 	bool                   _is_activated;
 	jack_position_t        _position;
 	jack_transport_state_t _transport_state;

@@ -107,6 +107,7 @@ typedef struct {
 	LV2_URID bufsz_sequenceSize;
 	LV2_URID log_Trace;
 	LV2_URID midi_MidiEvent;
+	LV2_URID osc_OscEvent;
 	LV2_URID param_sampleRate;
 	LV2_URID patch_Set;
 	LV2_URID patch_property;
@@ -135,6 +136,7 @@ typedef struct {
 	LilvNode* lv2_control;
 	LilvNode* lv2_name;
 	LilvNode* midi_MidiEvent;
+	LilvNode* osc_OscEvent;
 	LilvNode* pg_group;
 	LilvNode* pset_Preset;
 	LilvNode* rdfs_label;
@@ -200,6 +202,7 @@ typedef struct {
 	jack_nframes_t     sample_rate;    ///< Sample rate
 	jack_nframes_t     event_delta_t;  ///< Frames since last update sent to UI
 	uint32_t           midi_event_id;  ///< MIDI event class ID in event context
+	uint32_t           osc_event_id;  ///< MIDI event class ID in event context
 	jack_nframes_t     position;       ///< Transport position in frames
 	float              bpm;            ///< Transport tempo in beats per minute
 	bool               rolling;        ///< Transport speed (0=stop, 1=play)
