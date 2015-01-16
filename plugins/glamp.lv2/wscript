@@ -26,7 +26,7 @@ def configure(conf):
     autowaf.set_c99_mode(conf)
     autowaf.display_header('Glamp Configuration')
 
-    conf.check_c(header_name='GL/glu.h')
+    conf.check_cc(header_name='GL/glu.h')
 
     autowaf.check_pkg(conf, 'lv2', atleast_version='1.4.1',
                       uselib_store='LV2_1_4_1')
