@@ -17,12 +17,14 @@ out = 'build'
 
 def options(opt):
     opt.load('compiler_cxx')
+    opt.load('lv2')
     autowaf.set_options(opt)
     opt.add_option('--no-http', action='store_true', default=False, dest='no_http',
                     help="Do not build HTTP support, even if libsoup is available")
 
 def configure(conf):
     conf.load('compiler_cxx')
+    conf.load('lv2')
     autowaf.configure(conf)
     autowaf.display_header('Dirg Configuration')
 

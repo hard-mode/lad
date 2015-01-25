@@ -15,6 +15,7 @@ out     = 'build'       # Build directory
 
 def options(opt):
     opt.load('compiler_c')
+    opt.load('lv2')
     autowaf.set_options(opt)
     opt.add_option('--rate', type='int', default=48000,
                    dest='rate',
@@ -22,6 +23,7 @@ def options(opt):
 
 def configure(conf):
     conf.load('compiler_c')
+    conf.load('lv2')
     autowaf.configure(conf)
     autowaf.set_c99_mode(conf)
     autowaf.display_header('Blop.LV2 Configuration')

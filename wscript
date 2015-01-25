@@ -41,6 +41,7 @@ projects = '''
 def options(opt):
     opt.load('compiler_c')
     opt.load('compiler_cxx')
+    opt.load('lv2')
     autowaf.set_options(opt)
     opt.add_option('--cmd', type='string', dest='cmd',
                    help='Command to run from build directory (for run command)')
@@ -56,6 +57,7 @@ def sub_config_and_use(conf, name, has_objects = True, pkgname = ''):
 def configure(conf):
     conf.load('compiler_c')
     conf.load('compiler_cxx')
+    conf.load('lv2')
     autowaf.configure(conf)
     autowaf.set_recursive()
 
