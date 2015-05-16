@@ -103,7 +103,7 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
 			opts->dump = true;
 		} else if ((*argv)[a][1] == 'n' ){
 			if (opts->name) {
-				fprintf(stderr, "Client name is already %s, ignoring %s", opts->name, (*argv)[a]);
+				fprintf(stderr, "Client name is already %s, ignoring %s\n", opts->name, (*argv)[a+1]);
 				continue;
 			}
 			if (++a == *argc) {
@@ -113,7 +113,7 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
 			opts->name = jalv_strdup((*argv)[a]);
 		} else if ((*argv)[a][1] == 'N' ){
 			if (opts->name) {
-				fprintf(stderr, "Client name is already %s, ignoring %s", opts->name, (*argv)[a]);
+				fprintf(stderr, "Client name is already %s, ignoring %s\n", opts->name, (*argv)[a+1]);
 				continue;
 			}
 			if (++a == *argc) {

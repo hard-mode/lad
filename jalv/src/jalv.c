@@ -1072,34 +1072,59 @@ main(int argc, char** argv)
 	/* Create port structures (jalv.ports) */
 	jalv_create_ports(&jalv);
 
-	/* Get the plugin's name */
-	LilvNode*   name     = lilv_plugin_get_name(jalv.plugin);
-	const char* name_str = lilv_node_as_string(name);
-
-	/* Truncate plugin name to suit JACK (if necessary) */
+	/* Determine the name of the JACK client */
 	char* jack_name = NULL;
-	if (strlen(name_str) >= (unsigned)jack_client_name_size() - 1) {
-		jack_name = (char*)calloc(jack_client_name_size(), 1);
-		strncpy(jack_name, name_str, jack_client_name_size() - 1);
+
+	if (jalv.opts.name) {
+
+		/* If name has been set upon invocation */
+		if (strlen(jalv.opts.name) >= (unsigned)jack_client_name_size() - 1) {
+			jack_name = (char*)calloc(jack_client_name_size(), 1);
+			strncpy(jack_name, jalv.opts.name, jack_client_name_size() - 1);
+		} else {
+			jack_name = jalv_strdup(jalv.opts.name);
+		}
+
 	} else {
-		jack_name = jalv_strdup(name_str);
+
+		/* Get the plugin's name */
+		LilvNode*   name     = lilv_plugin_get_name(jalv.plugin);
+		const char* name_str = lilv_node_as_string(name);
+
+		/* Truncate plugin name to suit JACK (if necessary) */
+		if (strlen(name_str) >= (unsigned)jack_client_name_size() - 1) {
+			jack_name = (char*)calloc(jack_client_name_size(), 1);
+			strncpy(jack_name, name_str, jack_client_name_size() - 1);
+		} else {
+			jack_name = jalv_strdup(name_str);
+		}
+
+		lilv_node_free(name);
+
 	}
 
 	/* Connect to JACK */
 	printf("JACK Name:    %s\n", jack_name);
 #ifdef JALV_JACK_SESSION
 	if (jalv.opts.uuid) {
-		jalv.jack_client = jack_client_open(jack_name, JackSessionID, NULL,
-		                                    jalv.opts.uuid);
+		jalv.jack_client = jack_client_open(
+			jack_name,
+			JackSessionID | jalv.opts.name_exact ? JackUseExactName : 0,
+			NULL,
+			jalv.opts.uuid
+		);
 	}
 #endif
 
 	if (!jalv.jack_client) {
-		jalv.jack_client = jack_client_open(jack_name, JackNullOption, NULL);
+		jalv.jack_client = jack_client_open(
+			jack_name,
+			jalv.opts.name_exact ? JackUseExactName : JackNullOption,
+			NULL
+		);
 	}
 
 	free(jack_name);
-	lilv_node_free(name);
 
 	if (!jalv.jack_client)
 		die("Failed to connect to JACK.\n");
