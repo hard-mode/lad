@@ -39,6 +39,8 @@ print_usage(const char* name, bool error)
 	fprintf(os, "  -l DIR       Load state from save directory\n");
 	fprintf(os, "  -d DIR       Dump plugin <=> UI communication\n");
 	fprintf(os, "  -b SIZE      Buffer size for plugin <=> UI communication\n");
+	fprintf(os, "  -n NAME      Set JACK client name\n");
+	fprintf(os, "  -N NAME      Set exact JACK client name (exit if already taken)\n");
 	return error ? 1 : 0;
 }
 
