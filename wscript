@@ -14,8 +14,6 @@ top = '.'
 out = 'build'
 
 projects = '''
-    serd
-    sord
     sratom
     suil
     lilv
@@ -35,6 +33,8 @@ projects = '''
     plugins/glamp.lv2
     plugins/mesp.lv2
 '''.split()
+#    serd
+#    sord
 #    plugins/dirg.lv2
 #    plugins/lolep.lv2
 
