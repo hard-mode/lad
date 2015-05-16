@@ -1,0 +1,7 @@
+*.swp
+*.swo
+.lock*
+.waf*
+build
+serd
+sord
