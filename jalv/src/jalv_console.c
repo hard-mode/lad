@@ -101,6 +101,27 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
 			opts->controls[n_controls]     = NULL;
 		} else if ((*argv)[a][1] == 'd') {
 			opts->dump = true;
+		} else if ((*argv)[a][1] == 'n' ){
+			if (opts->name) {
+				fprintf(stderr, "Client name is already %s, ignoring %s", opts->name, (*argv)[a]);
+				continue;
+			}
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -n\n");
+				return 1;
+			}
+			opts->name = jalv_strdup((*argv)[a]);
+		} else if ((*argv)[a][1] == 'N' ){
+			if (opts->name) {
+				fprintf(stderr, "Client name is already %s, ignoring %s", opts->name, (*argv)[a]);
+				continue;
+			}
+			if (++a == *argc) {
+				fprintf(stderr, "Missing argument for -N\n");
+				return 1;
+			}
+			opts->name = jalv_strdup((*argv)[a]);
+			opts->name_exact = 1;
 		} else {
 			fprintf(stderr, "Unknown option %s\n", (*argv)[a]);
 			return print_usage((*argv)[0], true);
